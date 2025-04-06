@@ -1,0 +1,68 @@
+#jinja2: trim_blocks: True, lstrip_blocks: True
+# {{ ansible_managed }}
+# {{ template_fullpath | regex_replace('^' ~ role_path, role_path | basename) }}
+
+name: {{ docker_project_slug }}
+
+services:
+
+  jellyfin:
+    container_name: {{ docker_project_slug }}
+    image: lscr.io/linuxserver/jellyfin:{{ jellyfin_version }}
+    restart: unless-stopped
+    {% if jellyfin_network_mode == 'host' %}
+    network_mode: host
+    {% endif %}
+
+    {{ docker_project_compose_service_additional_options | indent(4) }}
+
+    environment:
+      - PUID={{ jellyfin_puid }}
+      - PGID={{ jellyfin_pgid }}
+      - TZ={{ timezone | default('UTC') }}
+      {% if jellyfin_publishedserverurl %}
+      - JELLYFIN_PublishedServerUrl={{ jellyfin_publishedserverurl }}
+      {% endif %}
+      {% if jellyfin_lsio_docker_mods %}
+      - DOCKER_MODS={{ jellyfin_lsio_docker_mods | default([], true) | join('|') }}
+      {% endif %}
+
+    {% if jellyfin_devices | default([]) | length > 0 %}
+    devices:
+      {% for item in jellyfin_devices %}
+      - {{ item }}
+      {% endfor %}
+    {% endif %}
+
+    volumes:
+      # Jellyfin config
+      - ./config:/config
+
+      # Media volumes
+      {% for item in jellyfin_media_volumes %}
+      - type: bind
+        source: {{ item.source }}
+        target: {{ item.target  }}
+        bind:
+          create_host_path: false
+      {% endfor %}
+      {% if jellyfin_additional_volumes | default([]) | length > 0 %}
+
+      # Additional volumes
+      {% for item in jellyfin_additional_volumes %}
+      - {{ item }}
+      {% endfor %}
+      {% endif %}
+
+    labels:
+      {{ traefik_project_base_labels | indent(6) }}
+
+      {% if docker_project_traefik_enable %}
+      {% endif %}
+
+{% if jellyfin_network_mode != 'host' %}
+networks:
+  {{ docker_project_default_network | indent(2) }}
+{% endif %}
+
+{{ docker_project_compose_additional_options }}

@@ -1,0 +1,137 @@
+Ansible Role: Jellyfin-docker
+=============================
+
+Install Jellyfin Docker Compose project.
+
+- https://jellyfin.org/
+- https://github.com/jellyfin/jellyfin
+
+Based on LinuxServer.io image: https://docs.linuxserver.io/images/docker-jellyfin/
+
+Requirements
+------------
+
+Requires the following to be installed:
+- docker
+- docker compose
+
+Role Variables
+--------------
+
+Common system variables:
+
+```yaml
+timezone: UTC
+```
+
+Common Docker projects variables:
+
+```yaml
+# Base directory for Docker projects
+docker_projects_path: # /var/apps
+```
+
+Available role variables are listed below, along with default values (see `defaults/main.yml`):
+
+```yaml
+# Docker project variables
+
+jellyfin_project_name: jellyfin
+
+# Docker project dynamic vars (uses `docker_project_name` prefix, adapt if overridden)
+
+jellyfin_traefik_loadbalancer_server_port: 8096
+
+# Main service additional docker-compose options (ex: cpu_shares, deploy, ...)
+jellyfin_compose_service_additional_options: "" # |
+#  ports:
+#    - 8096:8096     # Http webUI
+#    - 8920:8920     # Optional - Https webUI (you need to set up your own certificate).
+#    - 7359:7359/udp # Optional - Allows clients to discover Jellyfin on the local network.
+#    - 1900:1900/udp # Optional - Service discovery used by DNLA and clients.
+```
+
+```yaml
+# Jellyfin project variables
+
+# lscr.io/linuxserver/jellyfin image version
+jellyfin_version: latest
+
+# UID container is running as
+jellyfin_puid: "{{ ansible_user_uid }}"
+# GID container is running as
+jellyfin_pgid: "{{ ansible_user_gid }}"
+
+# Optional - alternative address used for autodiscovery
+jellyfin_publishedserverurl:
+
+# Jellyfin network mode (bridge|host)
+jellyfin_network_mode: bridge
+
+# Jellyfin media volumes
+jellyfin_media_volumes: []
+#  - source: "/share/media/series"
+#    target: "/data/series"
+#  - source: "/share/media/movies"
+#    target: "/data/movies"
+
+# Jellyfin devices
+jellyfin_devices: []
+#  # Intel/ATI/AMD
+#  - /dev/dri:/dev/dri
+#  - /dev/kfd:/dev/kfd
+
+#  # Raspberry Pi MMAL/OpenMAX
+#  - /dev/vcsm:/dev/vcsm
+#  - /dev/vchiq:/dev/vchiq
+
+#  # Raspberry Pi V4L2
+#  - /dev/video10:/dev/video10
+#  - /dev/video11:/dev/video11
+#  - /dev/video12:/dev/video12
+
+# Jellyfin additionsl volumes
+jellyfin_additional_volumes: []
+#  # Raspberry Pi MMAL/OpenMAX
+#  - /opt/vc/lib:/opt/vc/lib
+#  # Optional - extra fonts to be used during transcoding with subtitle burn-in
+#  - /path/to/fonts:/usr/local/share/fonts/custom:ro
+#  # Data directories
+#  - /var/jellyfin-data/cache:/config/cache
+#  - /var/jellyfin-data/data:/config/data
+ 
+# Linuxserver Docker mods (see https://github.com/linuxserver/docker-mods)
+jellyfin_lsio_docker_mods: []
+#  - linuxserver/mods:jellyfin-opencl-intel # https://github.com/linuxserver/docker-mods/tree/jellyfin-opencl-intel
+#  - linuxserver/mods:jellyfin-amd          # https://github.com/linuxserver/docker-mods/tree/jellyfin-amd
+#  - linuxserver/mods:jellyfin-rffmpeg      # https://github.com/linuxserver/docker-mods/tree/jellyfin-rffmpeg
+```
+
+Dependencies
+------------
+
+This role depends on :
+- [djuuu.docker_project](https://github.com/Djuuu/ansible-role-docker-project)
+
+Some variables allow integration with:
+- [djuuu.traefik_docker](https://github.com/Djuuu/ansible-role-traefik-docker)
+
+Example Playbook
+----------------
+
+```yaml
+- hosts: all
+  gather_facts: true
+  gather_subset:
+    - "!all"
+    - "!min"
+    - user_id
+
+  roles:
+    - djuuu.jellyfin_docker
+```
+
+License
+-------
+
+Beerware License
