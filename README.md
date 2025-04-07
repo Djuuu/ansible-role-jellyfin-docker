@@ -52,6 +52,40 @@ jellyfin_compose_service_additional_options: "" # |
 ```
 
 ```yaml
+jellyfin_traefik_middlewares:
+  - "jellyfin-security@docker"
+#  - "https-redirect@file"          # see djuuu.traefik_docker files/dynamic-conf/middlewares/https-redirect.yml
+#  - "csp-add-frame-ancestors@file" # see djuuu.traefik_docker templates/dynamic-conf/middlewares/csp-add-frame-ancestors.yml.j2
+
+# Jellyfin security headers middleware
+# https://jellyfin.org/docs/general/networking/traefik#docker-composeyml
+jellyfin_traefik_custom_labels: |-  
+  # The customResponseHeaders option lists the Header names and values to apply to the response.
+  traefik.http.middlewares.jellyfin-security.headers.customResponseHeaders.X-Robots-Tag: noindex,nofollow,nosnippet,noarchive,notranslate,noimageindex
+
+  # The stsSeconds is the max-age of the Strict-Transport-Security header. If set to 0, would NOT include the header.
+  traefik.http.middlewares.jellyfin-security.headers.stsSeconds: 31536000 # 1y (minimum)
+  
+  # The stsIncludeSubdomains is set to true, the includeSubDomains directive will be appended to the Strict-Transport-Security header.
+  traefik.http.middlewares.jellyfin-security.headers.stsIncludeSubdomains: true
+  
+  # Set stsPreload to true to have the preload flag appended to the Strict-Transport-Security header.
+  traefik.http.middlewares.jellyfin-security.headers.stsPreload: true
+  
+  # Set forceSTSHeader to true, to add the STS header even when the connection is HTTP.
+  traefik.http.middlewares.jellyfin-security.headers.forceSTSHeader: true
+  
+  # Set frameDeny to true to add the X-Frame-Options header with the value of DENY.
+  traefik.http.middlewares.jellyfin-security.headers.frameDeny: true
+  
+  # Set contentTypeNosniff to true to add the X-Content-Type-Options header with the value nosniff.
+  traefik.http.middlewares.jellyfin-security.headers.contentTypeNosniff: true
+  
+  # Set browserXssFilter to true to add the X-XSS-Protection header with the value 1; mode=block.
+  traefik.http.middlewares.jellyfin-security.headers.browserXssFilter: true
+```
+
+```yaml
 # Jellyfin project variables
 
 # lscr.io/linuxserver/jellyfin image version
