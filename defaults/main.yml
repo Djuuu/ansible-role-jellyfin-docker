@@ -9,7 +9,7 @@ jellyfin_project_name: jellyfin
 jellyfin_traefik_loadbalancer_server_port: 8096
 
 # Main service additional docker-compose options (ex: cpu_shares, deploy, ...)
-jellyfin_compose_service_additional_options: "" # |
+jellyfin_service_additional_options: "" # |
 #  ports:
 #    - 8096:8096     # Http webUI
 #    - 8920:8920     # Optional - Https webUI (you need to set up your own certificate).
@@ -61,9 +61,6 @@ jellyfin_pgid: "{{ ansible_user_gid }}"
 
 # Optional - alternative address used for autodiscovery
 jellyfin_publishedserverurl:
-
-# Jellyfin network mode (bridge|host)
-jellyfin_network_mode: bridge
 
 # Jellyfin media volumes
 jellyfin_media_volumes: []
