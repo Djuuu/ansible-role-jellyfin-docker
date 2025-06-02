@@ -55,6 +55,7 @@ services:
 
     labels:
       {{ traefik_project_base_labels | indent(6) }}
+      {{ docker_project_service_additional_labels | indent(6) }}
 
 {{ docker_project_networks }}
 
