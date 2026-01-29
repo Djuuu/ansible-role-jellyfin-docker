@@ -55,9 +55,9 @@ jellyfin_traefik_custom_labels: |-
 jellyfin_version: latest
 
 # UID container is running as
-jellyfin_puid: "{{ ansible_user_uid }}"
+jellyfin_puid: "{{ ansible_facts['user_uid'] }}"
 # GID container is running as
-jellyfin_pgid: "{{ ansible_user_gid }}"
+jellyfin_pgid: "{{ ansible_facts['user_gid'] }}"
 
 # Optional - alternative address used for autodiscovery
 jellyfin_publishedserverurl:
